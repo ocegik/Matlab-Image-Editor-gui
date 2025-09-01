@@ -10,7 +10,7 @@ function single_image_editor()
 
     f = figure('Name', 'MATLAB Image Editor', 'NumberTitle', 'off', ...
                'Position', [200 200 800 600]);
-
+               
     hAx = axes('Parent',f,'Position',[0.1 0.35 0.8 0.6]);
     hImg = imshow(img, 'Parent', hAx);
 
@@ -25,6 +25,8 @@ function single_image_editor()
     uicontrol('Style','pushbutton','String','Save Image',...
         'Units','normalized','Position',[0.4 0.1 0.2 0.05],...
         'Callback', @(~,~) saveImage());
+
+    uiwait(f);
 
     function updateImage()
         sliders = findobj(f,'Style','slider');
