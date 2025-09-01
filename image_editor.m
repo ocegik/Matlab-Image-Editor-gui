@@ -2,7 +2,7 @@ function image_editor
 
     [file, path] = uigetfile({'*.jpg;*.jpeg;*.png'}, 'Select an Image');
     if isequal(file,0)
-        disp("File not exist.");
+        disp("File not exist. Exiting.");
         return;
     end
 
