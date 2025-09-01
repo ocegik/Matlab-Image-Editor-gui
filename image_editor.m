@@ -1,19 +1,4 @@
-function image_editor
-    choice = questdlg('Do you want to edit a single image or batch process a folder?', ...
-                      'Select Mode', ...
-                      'Single Image','Batch Folder','Single Image');
-
-    switch choice
-        case 'Single Image'
-            editSingleImage();
-        case 'Batch Folder'
-            batch_process();
-        otherwise
-            disp('No selection made. Exiting.');
-    end
-end
-
-function editSingleImage()
+function single_image_editor()
     [file, path] = uigetfile({'*.jpg;*.jpeg;*.png'}, 'Select an Image');
     if isequal(file,0)
         disp("File not exist. Exiting.");
