@@ -12,36 +12,46 @@ function output = adjustContrast(img, factor)
     output = min(max(output,0),1);      
 end
 
-function output = applyGrayscale(img)
-   
-    if size(img,3) == 3  % check if RGB
-        output = rgb2gray(img);
+function output = adjustGrayscale(img, intensity)
+    if nargin < 2
+        intensity = 1; % default full grayscale if intensity not provided
+    end
+    if size(img,3) == 3  % RGB check
+        gray = rgb2gray(img);
+        gray = repmat(gray,[1 1 3]);  % convert to RGB
+        img = im2double(img);
+        output = (1-intensity)*img + intensity*gray;
     else
-        output = img;    % already grayscale
+        output = img;  % already grayscale
     end
 end
 
-function output = applySepia(img)
-    
+function output = adjustSepia(img, intensity)
+    if nargin < 2
+        intensity = 1; % default full sepia
+    end
     if size(img,3) ~= 3
-        img = repmat(img,[1 1 3]);  % convert grayscale to RGB
+        img = repmat(img,[1 1 3]);  % grayscale → RGB
     end
     img = im2double(img);
     sepiaFilter = [0.393 0.769 0.189;
                    0.349 0.686 0.168;
                    0.272 0.534 0.131];
-    output = img;
+    sepiaImg = img;
     for i = 1:size(img,1)
         for j = 1:size(img,2)
             rgb = squeeze(img(i,j,:));
             rgb = sepiaFilter * rgb;
-            output(i,j,:) = min(rgb,1);
+            sepiaImg(i,j,:) = min(rgb,1);
         end
     end
+    output = (1-intensity)*img + intensity*sepiaImg;
 end
 
-function output = applyNegative(img)
-   
+function output = adjustNegative(img, intensity)
+    if nargin < 2
+        intensity = 1; % default full negative
+    end
     img = im2double(img);
-    output = 1 - img;
+    output = (1-intensity)*img + intensity*(1-img);
 end
