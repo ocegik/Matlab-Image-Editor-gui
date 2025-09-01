@@ -28,13 +28,13 @@ function batch_process
         img = adjustBrightness(img, brightnessVal);
 
         if applyGray
-            img = applyGrayscale(img);
+            img = adjustGrayscale(img);
         end
         if applySepia
-            img = applySepia(img);
+            img = adjustSepia(img);
         end
         if applyNeg
-            img = applyNegative(img);
+            img = adjustNegative(img);
         end
 
         [~, name, ext] = fileparts(imgFiles(k).name);
