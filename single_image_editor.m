@@ -80,6 +80,73 @@ function single_image_editor()
                             'ForegroundColor', [0.9 0.9 0.9], ...
                             'HorizontalAlignment', 'center', ...
                             'Tag', 'contrastValue');
+    
+        % Sepia label
+    uicontrol('Style', 'text', 'String', 'Sepia', ...
+              'Units', 'normalized', 'Position', [0.1 0.16 0.15 0.03], ...
+              'FontSize', 11, 'FontWeight', 'bold', ...
+              'BackgroundColor', [0.15 0.15 0.15], ...
+              'ForegroundColor', [0.9 0.7 0.5], ...
+              'HorizontalAlignment', 'left');
+
+    hSepiaSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 1, 'Value', 0, ...
+        'Units', 'normalized', 'Position', [0.27 0.16 0.5 0.03], ...
+        'BackgroundColor', [0.25 0.25 0.25], ...
+        'ForegroundColor', [0.9 0.7 0.5], ...
+        'Tag', 'sepiaSlider', ...
+        'Callback', @(src,~) updateImage());
+
+    hSepiaValue = uicontrol('Style', 'text', 'String', '0.0', ...
+        'Units', 'normalized', 'Position', [0.78 0.16 0.08 0.03], ...
+        'FontSize', 10, ...
+        'BackgroundColor', [0.2 0.2 0.2], ...
+        'ForegroundColor', [0.9 0.9 0.9], ...
+        'HorizontalAlignment', 'center');
+
+    % Grayscale label
+    uicontrol('Style', 'text', 'String', 'Grayscale', ...
+              'Units', 'normalized', 'Position', [0.1 0.12 0.15 0.03], ...
+              'FontSize', 11, 'FontWeight', 'bold', ...
+              'BackgroundColor', [0.15 0.15 0.15], ...
+              'ForegroundColor', [0.7 0.9 1], ...
+              'HorizontalAlignment', 'left');
+
+    hGraySlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 1, 'Value', 0, ...
+        'Units', 'normalized', 'Position', [0.27 0.12 0.5 0.03], ...
+        'BackgroundColor', [0.25 0.25 0.25], ...
+        'ForegroundColor', [0.7 0.9 1], ...
+        'Tag', 'graySlider', ...
+        'Callback', @(src,~) updateImage());
+
+    hGrayValue = uicontrol('Style', 'text', 'String', '0.0', ...
+        'Units', 'normalized', 'Position', [0.78 0.12 0.08 0.03], ...
+        'FontSize', 10, ...
+        'BackgroundColor', [0.2 0.2 0.2], ...
+        'ForegroundColor', [0.9 0.9 0.9], ...
+        'HorizontalAlignment', 'center');
+
+    % Negative label
+    uicontrol('Style', 'text', 'String', 'Negative', ...
+              'Units', 'normalized', 'Position', [0.1 0.08 0.15 0.03], ...
+              'FontSize', 11, 'FontWeight', 'bold', ...
+              'BackgroundColor', [0.15 0.15 0.15], ...
+              'ForegroundColor', [1 0.6 0.6], ...
+              'HorizontalAlignment', 'left');
+
+    hNegativeSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 1, 'Value', 0, ...
+        'Units', 'normalized', 'Position', [0.27 0.08 0.5 0.03], ...
+        'BackgroundColor', [0.25 0.25 0.25], ...
+        'ForegroundColor', [1 0.6 0.6], ...
+        'Tag', 'negativeSlider', ...
+        'Callback', @(src,~) updateImage());
+
+    hNegativeValue = uicontrol('Style', 'text', 'String', '0.0', ...
+        'Units', 'normalized', 'Position', [0.78 0.08 0.08 0.03], ...
+        'FontSize', 10, ...
+        'BackgroundColor', [0.2 0.2 0.2], ...
+        'ForegroundColor', [0.9 0.9 0.9], ...
+        'HorizontalAlignment', 'center');
+
 
     % Control buttons
     uicontrol('Style', 'pushbutton', 'String', 'Reset', ...
@@ -116,94 +183,67 @@ function single_image_editor()
 
     function updateImage()
         try
-            % Safely get slider values using stored handles
-            if isvalid(hBrightnessSlider) && isvalid(hContrastSlider)
-                brightnessVal = get(hBrightnessSlider, 'Value');
-                contrastVal = get(hContrastSlider, 'Value');
-                
-                % Update value displays if they still exist
-                if isvalid(hBrightnessValue)
-                    set(hBrightnessValue, 'String', sprintf('%.0f', brightnessVal));
-                end
-                if isvalid(hContrastValue)
-                    set(hContrastValue, 'String', sprintf('%.1f', contrastVal));
-                end
-                
-                % Apply image adjustments with error handling
-                try
-                    editedImg = adjustContrast(img, contrastVal);
-                    editedImg = adjustBrightness(editedImg, brightnessVal);
-                    
-                    % Update image display if it still exists
-                    if isvalid(hImg)
-                        set(hImg, 'CData', editedImg);
-                    end
-                    
-                    % Visual feedback
-                    if isvalid(hProgressPanel)
-                        set(hProgressPanel, 'BackgroundColor', [0.2 0.6 0.2]);
-                        drawnow;
-                        pause(0.05);
-                        if isvalid(hProgressPanel)
-                            set(hProgressPanel, 'BackgroundColor', [0.1 0.1 0.1]);
-                        end
-                    end
-                    
-                catch adjustError
-                    % Handle image processing errors
-                    if isvalid(f)
-                        warndlg(['Image adjustment failed: ' adjustError.message], 'Processing Warning');
-                    end
-                end
+            % Sliders
+            brightnessVal = get(hBrightnessSlider, 'Value');
+            contrastVal   = get(hContrastSlider, 'Value');
+            sepiaVal      = get(hSepiaSlider, 'Value');
+            grayVal       = get(hGraySlider, 'Value');
+            negativeVal   = get(hNegativeSlider, 'Value');
+
+            % Update labels
+            set(hBrightnessValue, 'String', sprintf('%.0f', brightnessVal));
+            set(hContrastValue, 'String', sprintf('%.1f', contrastVal));
+            set(hSepiaValue, 'String', sprintf('%.2f', sepiaVal));
+            set(hGrayValue, 'String', sprintf('%.2f', grayVal));
+            set(hNegativeValue, 'String', sprintf('%.2f', negativeVal));
+
+            % Start from original image
+            editedImg = adjustContrast(img, contrastVal);
+            editedImg = adjustBrightness(editedImg, brightnessVal);
+
+            % Apply extra effects with intensity
+            if sepiaVal > 0
+                editedImg = adjustSepia(editedImg, sepiaVal);
             end
+            if grayVal > 0
+                editedImg = adjustGrayscale(editedImg, grayVal);
+            end
+            if negativeVal > 0
+                editedImg = adjustNegative(editedImg, negativeVal);
+            end
+
+            set(hImg, 'CData', editedImg);
+
+            % Status flash
+            set(hProgressPanel, 'BackgroundColor', [0.2 0.6 0.2]);
+            drawnow; pause(0.05);
+            set(hProgressPanel, 'BackgroundColor', [0.1 0.1 0.1]);
+
         catch ME
-            % Handle any other errors in updateImage
-            if isvalid(f)
-                warndlg(['Update failed: ' ME.message], 'Update Error');
-            end
+            warndlg(['Update failed: ' ME.message], 'Update Error');
         end
     end
 
+
+
     function resetImage()
-        try
-            % Reset sliders to default values if they exist
-            if isvalid(hBrightnessSlider)
-                set(hBrightnessSlider, 'Value', 0);
-            end
-            if isvalid(hContrastSlider)
-                set(hContrastSlider, 'Value', 1);
-            end
-            
-            % Update value displays if they exist
-            if isvalid(hBrightnessValue)
-                set(hBrightnessValue, 'String', '0');
-            end
-            if isvalid(hContrastValue)
-                set(hContrastValue, 'String', '1.0');
-            end
-            
-            % Reset image to original
-            editedImg = img;
-            if isvalid(hImg)
-                set(hImg, 'CData', editedImg);
-            end
-            
-            % Visual feedback
-            if isvalid(hProgressPanel)
-                set(hProgressPanel, 'BackgroundColor', [0.6 0.6 0.2]);
-                drawnow;
-                pause(0.1);
-                if isvalid(hProgressPanel)
-                    set(hProgressPanel, 'BackgroundColor', [0.1 0.1 0.1]);
-                end
-            end
-            
-        catch ME
-            if isvalid(f)
-                warndlg(['Reset failed: ' ME.message], 'Reset Error');
-            end
-        end
+        set(hBrightnessSlider, 'Value', 0);
+        set(hContrastSlider, 'Value', 1);
+        set(hSepiaSlider, 'Value', 0);
+        set(hGraySlider, 'Value', 0);
+        set(hNegativeSlider, 'Value', 0);
+
+        set(hBrightnessValue, 'String', '0');
+        set(hContrastValue, 'String', '1.0');
+        set(hSepiaValue, 'String', '0.0');
+        set(hGrayValue, 'String', '0.0');
+        set(hNegativeValue, 'String', '0.0');
+
+        editedImg = img;
+        set(hImg, 'CData', editedImg);
     end
+
+
 
     function saveImage()
         try
