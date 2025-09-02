@@ -31,8 +31,8 @@ function single_image_editor()
               'ForegroundColor', [0.95 0.95 0.95], ...
               'HorizontalAlignment', 'center');
 
-    yPos = 0.32;  
-    step = 0.06; 
+    yPos = 0.38;  
+    step = 0.05; 
 
     [hBrightnessSlider, hBrightnessValue] = makeSlider('Brightness', -100, 100, 0, ...
         [0.1 yPos 0.75 0.04], [0.7 0.9 1]);
@@ -53,34 +53,28 @@ function single_image_editor()
     [hNegativeSlider, hNegativeValue] = makeSlider('Negative', 0, 1, 0, ...
         [0.1 yPos 0.75 0.04], [1 0.6 0.6]); 
 
+    buttonYPos = 0.08;
+
     uicontrol('Style', 'pushbutton', 'String', 'Reset', ...
-              'Units', 'normalized', 'Position', [0.18 0.15 0.18 0.06], ...
+              'Units', 'normalized', 'Position', [0.18 buttonYPos 0.18 0.05], ...
               'FontSize', 12, 'FontWeight', 'bold', ...
               'BackgroundColor', [0.4 0.4 0.4], ...
               'ForegroundColor', [1 1 1], ...
               'Callback', @(~,~) resetImage());
 
     uicontrol('Style', 'pushbutton', 'String', '💾 Save', ...
-              'Units', 'normalized', 'Position', [0.41 0.15 0.18 0.06], ...
+              'Units', 'normalized', 'Position', [0.41 buttonYPos 0.18 0.05], ...
               'FontSize', 12, 'FontWeight', 'bold', ...
               'BackgroundColor', [0.2 0.7 0.2], ...
               'ForegroundColor', [1 1 1], ...
               'Callback', @(~,~) saveImage());
 
     uicontrol('Style', 'pushbutton', 'String', '❌ Close', ...
-              'Units', 'normalized', 'Position', [0.64 0.15 0.18 0.06], ...
+              'Units', 'normalized', 'Position', [0.64 buttonYPos 0.18 0.05], ...
               'FontSize', 12, 'FontWeight', 'bold', ...
               'BackgroundColor', [0.8 0.2 0.2], ...
               'ForegroundColor', [1 1 1], ...
               'Callback', @(~,~) closeEditor());
-
-    % Progress/status bar
-    hProgressPanel = uipanel('Parent', f, ...
-                           'Units', 'normalized', ...
-                           'Position', [0.1 0.07 0.8 0.025], ...
-                           'BackgroundColor', [0.1 0.1 0.1], ...
-                           'BorderType', 'line', ...
-                           'HighlightColor', [0.3 0.3 0.3]);
 
     uiwait(f);
 
@@ -93,8 +87,9 @@ function single_image_editor()
                   'HorizontalAlignment', 'left');
 
         hSlider = uicontrol('Style', 'slider', 'Min', minVal, 'Max', maxVal, 'Value', initVal, ...
-            'Units', 'normalized', 'Position', [pos(1)+0.17 pos(2) 0.5 pos(4)], ...
+            'Units', 'normalized', 'Position', [pos(1)+0.17 pos(2) 0.5 0.06], ...
             'BackgroundColor', [0.25 0.25 0.25], ...
+            'SliderStep', [0.01 0.1], ...
             'Callback', @(src,~) updateImage());
 
         hValue = uicontrol('Style', 'text', 'String', num2str(initVal), ...
@@ -137,12 +132,7 @@ function single_image_editor()
             end
 
             set(hImg, 'CData', editedImg);
-
-            % Status flash
-            set(hProgressPanel, 'BackgroundColor', [0.2 0.6 0.2]);
-            drawnow; pause(0.05);
-            set(hProgressPanel, 'BackgroundColor', [0.1 0.1 0.1]);
-
+        
         catch ME
             warndlg(['Update failed: ' ME.message], 'Update Error');
         end
@@ -178,24 +168,8 @@ function single_image_editor()
                 return;
             end
             
-            % Visual feedback during save
-            if isvalid(hProgressPanel)
-                set(hProgressPanel, 'BackgroundColor', [0.2 0.2 0.8]);
-                drawnow;
-            end
-            
             % Attempt to save the image
             imwrite(editedImg, fullfile(savePath, saveFile));
-            
-            % Success feedback
-            if isvalid(hProgressPanel)
-                set(hProgressPanel, 'BackgroundColor', [0.2 0.8 0.2]);
-                drawnow;
-                pause(0.2);
-                if isvalid(hProgressPanel)
-                    set(hProgressPanel, 'BackgroundColor', [0.1 0.1 0.1]);
-                end
-            end
             
             % Success message
             if isvalid(f)
@@ -203,17 +177,6 @@ function single_image_editor()
             end
             
         catch saveError
-            % Error feedback
-            if isvalid(hProgressPanel)
-                set(hProgressPanel, 'BackgroundColor', [0.8 0.2 0.2]);
-                drawnow;
-                pause(0.2);
-                if isvalid(hProgressPanel)
-                    set(hProgressPanel, 'BackgroundColor', [0.1 0.1 0.1]);
-                end
-            end
-            
-            % Error message
             if isvalid(f)
                 errordlg(['Save failed: ' saveError.message], 'Save Error');
             end
