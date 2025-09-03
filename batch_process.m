@@ -11,33 +11,29 @@ function batch_process
         mkdir(outputFolder);
     end
 
-    brightnessVal = 20;  
-    contrastVal = 1.2;  
-    applyGray = false;   
-    applySepia = false; 
-    applyNeg = false;    
+    [brightnessVal, contrastVal, sepiaVal, grayVal, negativeVal] = filter_settings();
 
-    imgFiles = dir(fullfile(inputFolder, '*.jpg'));
-    imgFiles = [imgFiles; dir(fullfile(inputFolder, '*.png'))]; 
+    imgFiles = [dir(fullfile(inputFolder, '*.jpg')); dir(fullfile(inputFolder, '*.png'))];
 
     for k = 1:length(imgFiles)
         imgPath = fullfile(inputFolder, imgFiles(k).name);
         img = imread(imgPath);
 
+        % Apply effects with chosen params
         img = adjustContrast(img, contrastVal);
         img = adjustBrightness(img, brightnessVal);
 
-        if applyGray
-            img = adjustGrayscale(img);
+        if sepiaVal > 0
+            img = adjustSepia(img, sepiaVal);
         end
-        if applySepia
-            img = adjustSepia(img);
+        if grayVal > 0
+            img = adjustGrayscale(img, grayVal);
         end
-        if applyNeg
-            img = adjustNegative(img);
+        if negativeVal > 0
+            img = adjustNegative(img, negativeVal);
         end
 
-        [~, name, ext] = fileparts(imgFiles(k).name);
+    [~, name, ext] = fileparts(imgFiles(k).name);
         savePath = fullfile(outputFolder, [name '_processed' ext]);
         imwrite(img, savePath);
         disp(['Processed: ' imgFiles(k).name]);
