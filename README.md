@@ -34,6 +34,7 @@ This project is a MATLAB/Octave-based Image Editor with both single-image and ba
 ```
 batch_process.m          % Handles batch image processing
 single_image_editor.m    % Handles single image editing
+filter_settings.m        % Handles Filters at one place
 main.m                   % Entry point of the application
 filters/                 % Folder containing all filter functions
   adjustBrightness.m
